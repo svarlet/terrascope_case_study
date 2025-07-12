@@ -4,12 +4,6 @@
 
 ```mermaid
 architecture-beta
-  group backend(server)[Backend]
-    service api-gateway(logos:aws-api-gateway)[API Gateway] in backend
-    service lambdas(logos:aws-lambda)[Lambdas] in backend
-
-    api-gateway:R -- L:lambdas
-
   group activity-ingestion(database)[Activities ingestion]
     service client-activity-queue(logos:aws-sqs)[Client activities queue] in activity-ingestion
     service client-activity-processor(logos:aws-lambda)[Client activity processor] in activity-ingestion
@@ -24,11 +18,18 @@ architecture-beta
     ef-results-queue:L -- R:ef-results-processor
     ef-results-processor:B -- T:ef-matching-cache
 
+  group backend(server)[Backend]
+    service api-gateway(logos:aws-api-gateway)[API Gateway] in backend
+    service lambdas(logos:aws-lambda)[Lambdas] in backend
+
+    api-gateway:R -- L:lambdas
+    lambdas{group}:R -- L:client-activity-queue{group}
+
   group frontend(internet)[Frontend]
     service browser(logos:react)[React Frontend] in frontend
     service cdn(logos:aws-cloudfront)[CDN] in frontend
 
     browser:R -- L:cdn
-    browser:B -- T:api-gateway{group}
+    browser{group}:B -- T:api-gateway{group}
 
 ```
