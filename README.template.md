@@ -5,8 +5,8 @@
 ```mermaid
 architecture-beta
   group backend(server)[Backend]
-    service api-gateway(logos:aws-api-gateway)[Endpoints] in backend
-    service lambdas(logos:aws-lambda)[Endpoint executors] in backend
+    service api-gateway(logos:aws-api-gateway)[API Gateway] in backend
+    service lambdas(logos:aws-lambda)[Lambdas] in backend
     api-gateway:B -- T:lambdas
 
   group frontend(internet)[Frontend]
