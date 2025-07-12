@@ -7,7 +7,7 @@ architecture-beta
   group frontend(internet)[Frontend]
 
   service frontend(internet)[React Frontend] in frontend
-  service cdn(logos:aws-cloudfront)[Content Delivery Network (CDN)] in frontend
+  service cdn(logos:aws-cloudfront)[Content Delivery Network] in frontend
   frontend:B -- T:cdn
 
   group api(cloud)[API]
