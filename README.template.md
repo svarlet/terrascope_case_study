@@ -6,7 +6,7 @@
 architecture-beta
   group backend(server)[Backend]
   service api-gateway(logos:aws-api-gateway)[API Endpoints exposed by AWS API Gateway] in backend
-  service lambdas(logos:aws-lambdas)[Endpoint executors]
+  service lambdas(logos:aws-lambda)[Endpoint executors]
 
   group frontend(internet)[Frontend]
   service browser(logos:react)[React Frontend] in frontend
