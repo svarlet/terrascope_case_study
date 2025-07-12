@@ -11,7 +11,7 @@ architecture-beta
     api-gateway:R -- L:lambdas
 
   group activity-ingestion(database)[Activities ingestion]
-    service client-activity-queue(logos:aws-sqs)[Client activities queues] in activity-ingestion
+    service client-activity-queue(logos:aws-sqs)[Client activities queue] in activity-ingestion
     service client-activity-processor(logos:aws-lambda)[Client activity processor] in activity-ingestion
     service ai-matcher(cloud)[AI Matcher] in activity-ingestion
     service ef-results-queue(logos:aws-sqs)[EF results queue] in activity-ingestion
