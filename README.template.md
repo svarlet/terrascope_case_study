@@ -5,20 +5,11 @@
 ```mermaid
 architecture-beta
   group frontend(internet)[Frontend]
-
   service browser(logos:react)[React Frontend] in frontend
   service cdn(logos:aws-cloudfront)[Content Delivery Network] in frontend
-
   browser:B -- T:cdn
 
-  group api(cloud)[API]
-
-  service db(database)[Database] in api
-  service disk1(disk)[Storage] in api
-  service disk2(disk)[Storage] in api
-  service server(server)[Server] in api
-
-  db:L -- R:server
-  disk1:T -- B:server
-  disk2:T -- B:db
+  group backend(server)[Backend]
+  service api-gateway(logos:aws-api-gateway)[API Endpoints exposed by AWS API Gateway] in backend
+  service lambdas(logos:aws-lambdas)[Endpoint executors]
 ```
