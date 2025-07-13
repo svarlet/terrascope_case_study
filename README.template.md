@@ -34,7 +34,7 @@ architecture-beta
 
     iam:B -- T:support1
     auth:T -- B:support1
-    support1:R -- L:support2
+    support1:L -- R:support2
     kms:B -- T:support2
     cloudwatch:T -- B:support2
 
@@ -55,13 +55,11 @@ architecture-beta
 
     lambdas:B -- T:client-activity-queue
 
-    lambdas{group}:R -- L:support1
+    lambdas{group}:L -- R:support1
     frontend-backend:L -- R:frontend-backend-left
     frontend-backend:R -- L:frontend-backend-right
     frontend-backend-left:B -- T:api-gateway
     frontend-backend-right:B -- T:submited_activities_bucket
-
-    
 
   group frontend(internet)[Frontend]
     service browser(logos:react)[React Frontend] in frontend
