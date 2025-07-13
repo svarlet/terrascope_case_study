@@ -10,18 +10,19 @@ architecture-beta
     service ai-matcher(cloud)[AI Matcher] in activity-ingestion
     service ef-results-queue(logos:aws-sqs)[EF results queue] in activity-ingestion
     service ef-results-processor(logos:aws-lambda)[EF result processor] in activity-ingestion
-    service ef-matching-cache(logos:aws-dynamodb)[EF Matching Cache] in activity-ingestion
 
     junction ai-matcher-to-queue in activity-ingestion
 
     client-activity-queue:B --> T:cache-aware-router
-    cache-aware-router:R --> L:ef-matching-cache
     cache-aware-router:L --> R:ai-matcher
 
     ai-matcher:B -- T:ai-matcher-to-queue
     ai-matcher-to-queue:R --> L:ef-results-queue
+
+    junction router-store-processor in activity-ingestion
+    cache-aware-router:R -- L:router-store-processor
     ef-results-queue:R --> L:ef-results-processor
-    ef-results-processor:T --> B:ef-matching-cache
+    ef-results-processor:T -- B:router-store-processor
 
   group backend-support-systems(cloud)[Backend support systems]
     service auth(logos:aws-cognito)[Auth by Cognito] in backend-support-systems
@@ -42,6 +43,7 @@ architecture-beta
     service api-gateway(logos:aws-api-gateway)[API by API Gateway] in backend
     service lambdas(logos:aws-lambda)[Lambdas] in backend
     service submited_activities_bucket(logos:aws-s3)[Submitted activities store by S3 presigned URLs] in backend
+    service emissions-store(logos:aws-aurora)[Emissions store by Aurora] in backend
 
     junction frontend-backend in backend
     junction frontend-backend-left in backend
@@ -60,6 +62,11 @@ architecture-beta
     frontend-backend:R -- L:frontend-backend-right
     frontend-backend-left:B -- T:api-gateway
     frontend-backend-right:B -- T:submited_activities_bucket
+  
+    junction lambdas-emissions-store in backend 
+    lambdas:R -- L:lambdas-emissions-store
+    lambdas-emissions-store:B -- T:emissions-store
+    emissions-store:B -- T:router-store-processor
 
   group frontend(internet)[Frontend]
     service browser(logos:react)[React Frontend] in frontend
@@ -69,4 +76,14 @@ architecture-beta
     browser:R -- L:cdn
     browser{group}:B -- T:frontend-backend
     cdn:R -- L:frontend-bucket
+
+  group cicd(cloud)[CICD]
+    service vcs(logos:github-icon)[Github] in cicd
+    service continuous-delivery(logos:github-actions)[CICD pipeline by Github Actions] in cicd
+    service iac(logos:terraform-icon)[Infra as Code by Terraform] in cicd
+    
+    junction cicd1 in cicd
+    vcs:R -- L:cicd1
+    iac:L -- R:cicd1 
+    cicd1:B -- T:continuous-delivery
 ```
