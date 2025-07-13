@@ -41,21 +41,27 @@ architecture-beta
   group backend(server)[Backend]
     service api-gateway(logos:aws-api-gateway)[API by API Gateway] in backend
     service lambdas(logos:aws-lambda)[Lambdas] in backend
-    service submited_activities_bucket(logos:aws-s3)[Submitted activities store by S3] in backend
+    service submited_activities_bucket(logos:aws-s3)[Submitted activities store by S3 presigned URLs] in backend
 
     junction frontend-backend in backend
     junction frontend-backend-left in backend
     junction frontend-backend-right in backend
+    
+    junction public-lambdas in backend
 
-    api-gateway:R -- L:lambdas
+    api-gateway:R -- L:public-lambdas
+    submited_activities_bucket:L -- R:public-lambdas
+    public-lambdas:B -- T:lambdas
+
     lambdas:B -- T:client-activity-queue
-    lambdas:T -- B:submited_activities_bucket
 
     lambdas{group}:R -- L:support1
     frontend-backend:L -- R:frontend-backend-left
     frontend-backend:R -- L:frontend-backend-right
     frontend-backend-left:B -- T:api-gateway
     frontend-backend-right:B -- T:submited_activities_bucket
+
+    
 
   group frontend(internet)[Frontend]
     service browser(logos:react)[React Frontend] in frontend
