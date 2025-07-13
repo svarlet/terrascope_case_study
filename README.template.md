@@ -26,9 +26,11 @@ architecture-beta
   group backend(server)[Backend]
     service api-gateway(logos:aws-api-gateway)[API Gateway] in backend
     service lambdas(logos:aws-lambda)[Lambdas] in backend
+    service auth(logos:aws-cognito)[Auth] in backend
 
     api-gateway:R -- L:lambdas
-    lambdas{group}:B -- T:client-activity-queue{group}
+    lambdas{group}:B -- T:client-activity-queue
+    lambdas:R -- L:auth
 
   group frontend(internet)[Frontend]
     service browser(logos:react)[React Frontend] in frontend
