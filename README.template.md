@@ -28,7 +28,7 @@ architecture-beta
   group frontend(internet)[Frontend]
     service browser(logos:react)[React Frontend] in frontend
     service cdn(logos:aws-cloudfront)[CDN] in frontend
-    service frontend-bucket(logos:aws-s3)[Frontend sources]
+    service frontend-bucket(logos:aws-s3)[Frontend sources] in frontend
 
     browser:R -- L:cdn
     browser{group}:B -- T:api-gateway{group}
