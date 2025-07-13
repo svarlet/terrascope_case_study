@@ -12,11 +12,15 @@ architecture-beta
     service ef-results-processor(logos:aws-lambda)[EF result processor] in activity-ingestion
     service ef-matching-cache(logos:aws-dynamodb)[EF Matching Cache] in activity-ingestion
 
+    junction cache-check
+
     client-activity-queue:R -- L:client-activity-processor
-    client-activity-processor:B -- T:ai-matcher
-    ai-matcher:L -- R:ef-results-queue
-    ef-results-queue:L -- R:ef-results-processor
-    ef-results-processor:B -- T:ef-matching-cache
+    client-activity-processor:B -- T:cache-check
+    cache-check:B -- T:ai-matcher
+    cache-check:B -- T:ef-matching-cache
+    ai-matcher:B -- T:ef-results-queue
+    ef-results-queue:B -- T:ef-results-processor
+    ef-results-processor:B -- B:ef-matching-cache
 
   group backend(server)[Backend]
     service api-gateway(logos:aws-api-gateway)[API Gateway] in backend
