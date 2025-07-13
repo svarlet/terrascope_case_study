@@ -16,11 +16,11 @@ architecture-beta
 
     client-activity-queue:R -- L:client-activity-processor
     client-activity-processor:B -- T:cache-check
-    cache-check:B -- T:ai-matcher
-    cache-check:B -- T:ef-matching-cache
+    cache-check:R -- L:ai-matcher
+    cache-check:L -- R:ef-matching-cache
     ai-matcher:B -- T:ef-results-queue
     ef-results-queue:B -- T:ef-results-processor
-    ef-results-processor:B -- B:ef-matching-cache
+    ef-results-processor:L -- R:ef-matching-cache
 
   group backend(server)[Backend]
     service api-gateway(logos:aws-api-gateway)[API Gateway] in backend
