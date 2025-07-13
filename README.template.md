@@ -32,6 +32,6 @@ architecture-beta
 
     browser:R -- L:cdn
     browser{group}:B -- T:api-gateway{group}
-    cdn:B -- T:frontend-bucket
+    cdn:R -- L:frontend-bucket
 
 ```
