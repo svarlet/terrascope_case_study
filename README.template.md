@@ -106,16 +106,18 @@ Start onboarding customers. Evaluate the UX of file uploads. Discover the hetero
 
 **Key product increments**
 
-- Simple frontend with `Basic` Auth, activities upload form, and non-paginated activity viewer;
-- API to upload activities file and store individual activities in the database
-- S3 bucket to store uploaded activities
+- Simple frontend with `Basic` Auth, activities upload form;
+- API to upload activities as a CSV file and log individual activities;
+- S3 bucket to store uploaded activities;
+- Terraform scripts;
 
 #### Delivery #2
 
 **Objective**
 
-fixme
+Early AI Matcher discovery: discover challenges, risks, API differences, etc.
 
 **Key product increments**
 
-fixme
+- Activities are individually pushed to the AI Matcher through an SQS queue with a unique lambda listener (concurrency = 1)
+- AI Matcher results queued with SQS and a unique lambda listener who records the activity, its emission factor, and its emissions to the database
