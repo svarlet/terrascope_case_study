@@ -129,7 +129,7 @@ Early AI Matcher discovery: discover challenges, risks, API differences, etc.
 
 #### 🚀 Delivery #3
 
-Objective
+**Objective**
 
 Enable the system to scale considering the AI Matcher performance and scale constraints
 
