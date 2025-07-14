@@ -16,7 +16,7 @@ NB. The plan that follows should be challenged and rearranged in the face of mar
 
 ### Sliced delivery plan
 
-#### Delivery #1
+#### Delivery #1 🚀
 
 **Objective**
 
