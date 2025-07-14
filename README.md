@@ -16,7 +16,7 @@ NB. The plan that follows should be challenged and rearranged in the face of mar
 
 ### Sliced delivery plan
 
-#### Delivery #1 🚀
+#### 🚀 Delivery #1
 
 **Objective**
 
@@ -30,7 +30,7 @@ Start onboarding customers. Evaluate the UX of file uploads. Discover the hetero
 - Terraform scripts;
 - Continuous delivery with Github Actions
 
-#### Delivery #2
+#### 🚀 Delivery #2
 
 **Objective**
 
@@ -43,7 +43,7 @@ Early AI Matcher discovery: discover challenges, risks, API differences, etc.
 - AI Matcher failures forwarded to a dead letter queue.
 - Frontend shows a paginated table of the activities and their respective emissions
 
-#### Delivery #3
+#### 🚀 Delivery #3
 
 Objective
 
@@ -55,7 +55,7 @@ Enable the system to scale considering the AI Matcher performance and scale cons
 - Trigger the AI Matcher when the activity has no reusable historical data (a form of caching with our database)
 - Enable concurrent processing of AI Matcher results
 
-#### Delivery #4
+#### 🚀 Delivery #4
 
 **Objective**
 
@@ -67,7 +67,7 @@ Near real time visibility on health of the infrastructure.
 - Thresholds defined (queues, dead-letter queues, lambda invocations, latencies, cpu/memory usage)
 - Alarms set up
 
-#### Delivery #5
+#### 🚀 Delivery #5
 
 **Objective**
 
@@ -78,7 +78,7 @@ Isolate customers and upgrade authentication.
 - Single tenant infrastructure (dedicated AWS infrastructure per tenant). Terraform scripts refactored accordingly.
 - AWS Cognito to support user authentication
 
-#### Delivery #6
+#### 🚀 Delivery #6
 
 **Objective**
 
