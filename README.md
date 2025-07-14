@@ -17,6 +17,7 @@ The Product Team and the customers will collaborate _directly_ to codevelop the 
 #### Delivery #1
 
 **Objective**
+
 Start onboarding customers. Evaluate the UX of file uploads. Discover the heterogeneity of customers' data.
 
 **Key product increments**
@@ -28,7 +29,9 @@ Start onboarding customers. Evaluate the UX of file uploads. Discover the hetero
 #### Delivery #2
 
 **Objective**
+
 fixme
 
 **Key product increments**
+
 fixme
