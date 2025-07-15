@@ -322,3 +322,49 @@ Another user may simultaneously get the following feature flags:
   "product_tips"
 ]
 ```
+
+#### Activities upload
+
+##### POST /v1/avtivities
+
+This endpoint accepts a csv file of customer activities. There are various outcomes to uploading activities:
+
+- Each activity is successfully ingested by the system, and their processing will ensue;
+- Some activities are not parsable (so none are ingested)
+- Some activities are successfully ingested, but the system failed to accept some (unhealthy system, blip, ...).
+
+The endpoint accomodates these scenarios by responding with an ingestion report.
+
+**Request headers**
+
+```
+Authorization: Bearer <jwt token>
+Content-Type: multipart/form-data
+```
+
+**Request payload**
+
+It's the CSV file.
+
+**Response**
+
+Assuming a valid JWT token and no ingestion issue, the API responds with a `202` status code indicating that the data was successfully accepted and processing will ensue.
+
+If the parser fails to process any of the activities, the file is rejected as a whole. The API responds with a `400` code and a payload reporting the parsing errors.
+
+```json
+[
+  {
+    "line": positive int >= 0,
+    "index": positive int >= 0,
+    "error": string,
+    "message": string
+  }
+]
+```
+
+Finally, given a syntaxically valid CSV file, the API will respond with a `422` status code when the system was unable to ingest some activities. The response payload will report precisely the items that could not be ingested.
+
+```json
+string // CSV rows that could not be ingested this time
+```
