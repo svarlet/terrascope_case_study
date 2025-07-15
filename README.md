@@ -215,3 +215,20 @@ Assuming a valid jwt token (structure and expiry check), the endpoint responds w
 ```json
 [string]
 ```
+
+**Example**
+
+```json
+[
+  "product_tips", // product tips can be displayed
+  "dark_theme_selector" // the dark theme selector can be displayed
+]
+```
+
+At the same moment, another user may get the following feature flags:
+
+```json
+[
+  product_tips
+]
+```
