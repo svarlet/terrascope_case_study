@@ -397,6 +397,7 @@ The response payload contains activities that match the page specified with the 
   "activities": [
     {
       "id": uuid,
+      "url": url,
       "emissions": {
         "pollutant": {
           "id": uuid,
