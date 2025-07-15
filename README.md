@@ -4,6 +4,20 @@
 
 ![diagram](./mermaid/README-1.svg)
 
+## Key workflows
+
+### File processing workflow
+
+This workflow starts by a CSV file upload from our web application to an S3 bucket using "pre-signed urls". This AWS S3 feature enables the user to upload a file directly to our private S3 bucket thereby freeing a lambda from performing this bits-moving task, especially considering that lambdas aren't allowed to last more than 15 minutes.
+
+The uploaded file groups activities which needs to be processed individually, so we will parse each line to validate their syntax and semantics. If we find any invalid line, we reject the whole group to give the accountant a chance to fix the file and re-upload. Should the file pass this validation step, we update our database by recording each activity separately.
+
+The activities are initialized with a status indicating they've been ingested and are ready to be matched with an emission factor.
+
+![diagram](./mermaid/README-2.svg)
+
+### Activity emission factor matching workflow
+
 ## Project delivery
 
 ### Principles

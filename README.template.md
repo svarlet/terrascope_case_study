@@ -88,6 +88,36 @@ architecture-beta
     cicd1:B -- T:continuous-delivery
 ```
 
+## Key workflows
+
+### File processing workflow
+
+This workflow starts by a CSV file upload from our web application to an S3 bucket using "pre-signed urls". This AWS S3 feature enables the user to upload a file directly to our private S3 bucket thereby freeing a lambda from performing this bits-moving task, especially considering that lambdas aren't allowed to last more than 15 minutes.
+
+The uploaded file groups activities which needs to be processed individually, so we will parse each line to validate their syntax and semantics. If we find any invalid line, we reject the whole group to give the accountant a chance to fix the file and re-upload. Should the file pass this validation step, we update our database by recording each activity separately.
+
+The activities are initialized with a status indicating they've been ingested and are ready to be matched with an emission factor.
+
+```mermaid  
+flowchart TD
+    A[User requests to upload a file] --> B[Backend creates upload record in DB<br>status = 'pending_upload']
+    B --> C[Backend generates pre-signed S3 URL]
+    C --> D[Frontend uploads file directly to S3]
+    D --> E[Frontend notifies backend]
+    E --> F[Backend updates upload status to 'uploaded']
+    F --> G[Background worker starts parsing file from S3]
+    G --> H{All rows valid?}
+
+    H -- Yes --> I[Create activity records<br>1 per row]
+    I --> J[Update upload status to 'parsed']
+
+    H -- No --> K[Do not create any activities]
+    K --> L[Update upload status to 'failed']
+    L --> M[Set failure_reason, e.g. invalid unit, bad format, etc.]
+```
+
+### Activity emission factor matching workflow
+
 ## Project delivery
 
 ### Principles
