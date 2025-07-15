@@ -86,6 +86,7 @@ Distinct user accounts (accountants and viewers) with adequate authorizations.
 
 **Key product increments**
 
+- Admin account can invite users and set their role via Admin page
 - Accountant user type can upload and view activities
 - Viewers can view activities
 
@@ -341,3 +342,5 @@ The response payload contains activities that match the page specified with the 
   ]
 }
 ```
+
+### Data schema
