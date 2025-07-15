@@ -105,7 +105,7 @@ flowchart TD
     C --> D[Frontend uploads file directly to S3]
     D --> E[Frontend notifies backend]
     E --> F[Backend updates upload status to 'uploaded']
-    F --> G[Background worker starts parsing file from S3]
+    F --> G[Lambda starts parsing file from S3]
     G --> H{All rows valid?}
 
     H -- Yes --> I[Create activity records<br>1 per row]
