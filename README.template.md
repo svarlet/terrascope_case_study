@@ -636,3 +636,4 @@ CREATE TABLE uploads (
 | **Risk**                              | **Impact** | **Likelihood** | **Mitigation**                                                                                    |
 | ------------------------------------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------- |
 | Failures or retries are hard to trace | Medium     | Medium         | Add `retry_count`, `last_attempt_at`, and processing logs. Build lightweight admin UI for review. |
+| Debugging the lifecycle of an activity is hard and slow | Low | High | Integrate distributed tracing to gain visibility on the lifecycle transitions, timings, etc. |
