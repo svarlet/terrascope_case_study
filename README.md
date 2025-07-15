@@ -22,6 +22,24 @@ This workflow ensures clean, reliable data while keeping the user experience str
 
 ### Activity emission factor matching workflow
 
+Once a file has been successfully parsed and the business activities have been stored in the system, each activity is sent for automatic processing through an external AI-based emission factor matcher.
+
+This matcher receives the raw description, volume, and unit of each activity and attempts to find the most appropriate emission factor from a curated dataset. Because this is a third-party service that may take several minutes to respond and has concurrency limits, activities are sent to it asynchronously through a processing queue.
+
+A dedicated worker in our system listens for the results. When a match is returned, it immediately calculates the emissions for that activity using the matched emission factor. The activity record is then updated with the final emissions value, the emission factor used, and the confidence level returned by the AI.
+
+If the AI fails to return a usable match or the input cannot be interpreted (for example, due to vague or nonsensical descriptions), the activity is marked as failed, and the failure reason is stored for visibility and troubleshooting.
+
+This design ensures that:
+
+- The matching and calculation process is scalable and fault-tolerant.
+- Each activity progresses independently, without blocking the entire upload.
+- Accountants are presented with either a complete emissions result or a clear, actionable failure message.
+
+By fully automating the matching and calculation steps while making errors transparent, the system enables fast, accurate emissions reporting with minimal back-and-forth or manual intervention.
+
+![diagram](./mermaid/README-3.svg)
+
 ## Project delivery
 
 ### Principles
