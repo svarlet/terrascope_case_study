@@ -1,9 +1,5 @@
 # Terrascope Case Study
 
-## High-level diagram
-
-![diagram](./mermaid/README-1.svg)
-
 ## Key workflows
 
 ### File processing workflow
@@ -18,7 +14,7 @@ This all-or-nothing approach is intentional. While it may seem strict, it is act
 
 This workflow ensures clean, reliable data while keeping the user experience straightforward and predictable.
 
-![diagram](./mermaid/README-2.svg)
+![diagram](./mermaid/README-1.svg)
 
 ### Activity emission factor matching workflow
 
@@ -32,7 +28,7 @@ When a valid result is returned, the system calculates the emissions and stores 
 
 This hybrid approach gives us the best of both worlds: performance and scalability via caching, and accuracy and flexibility via the AI matcher when needed. It also helps us reduce latency, control costs, and serve more customers reliably as the system grows.
 
-![diagram](./mermaid/README-3.svg)
+![diagram](./mermaid/README-2.svg)
 
 ## Project delivery
 
@@ -121,6 +117,10 @@ Distinct user accounts (accountants and viewers) with adequate authorizations.
 - Viewers can view activities
 
 ## Technical implementation
+
+### High-level diagram
+
+![diagram](./mermaid/README-3.svg)
 
 ### Key API endpoints
 
