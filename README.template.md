@@ -1,5 +1,13 @@
 # Terrascope Case Study
 
+## INBOX
+
+[ ] Risks and mitigations
+[ ] Review delivery plan
+[ ] Review principples
+[ ] Did I document single-tenant infra?
+[ ] Document assumptions
+
 ## Key workflows
 
 ### File processing workflow
