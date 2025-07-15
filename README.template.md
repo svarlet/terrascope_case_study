@@ -3,10 +3,6 @@
 ## INBOX
 
 - [ ] Review principples
-- [ ] Did I document single-tenant infra?
-- [ ] Document choice of storage: S3 and Aurora focusing on scalability and latency
-- [ ] Document choice of Cognito, IAM, RBAC/roles, and single tenant infra for security and user management
-- [ ] Document the programming stack (react, python, node, framework, etc.)
 - [ ] Document the deployment strategy (trunk based, automated testing, linting, terraform, feature flags)
 
 ## Supporting assumptions
@@ -85,7 +81,14 @@ flowchart TD
 
 Rooted in Agile principles and a Product Mindset, the following customer-centric delivery plan aims to slice feature development to achieve small-yet-frequent value-add deliveries.
 
-The Product Team and the customers will collaborate _directly_ to codevelop the product by prioritizing value-adds, and tweaking, reworking, or pivoting early until efforts achieve customer success. We will avoid information relays or silos, sometimes observed when the Product Team is not directly connected to the customers. Doing so, we aim to engage the Product Team beyond coding, and engage customers in building the product they love, thereby fostering Employees and Customers retention.
+The making of software products is a function of its engineering processes: suboptimal development practices compound to exponential software rot and lead to unhappy management and customers. This plan recommends battle-tested techniques and practices:
+
+- Working iteratively and incrementally, delivering often, and getting feedback often;
+- Periodically reviewing our ways of working to do more of what works, and improve wasteful practices;
+- Developing a fast and exhaustive automated test suite that builds confidence about the state of the system in seconds;
+- Connecting teams directly with their customers to engage our product makers with the vision and their impact;
+- Empowering teams to design the software they build: how? at which pace?
+- Fostering a strong sense of ownership by co-deciding the roadmap and releases, and sharing the burden of on-call support.
 
 NB. The plan that follows should be challenged and rearranged in the face of market changes, customer feedback, or a shift in business priorities. It represents an optimistic strategy to construct the product from scratch.
 
