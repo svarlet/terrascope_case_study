@@ -93,6 +93,12 @@ Distinct user accounts (accountants and viewers) with adequate authorizations.
 
 ### Key API endpoints
 
+#### API Versionning
+
+We introduce API versionning now, not because multiple API versions are already designed but because now is the easiest time to account for multiple API versions in our API design. We are using a simple, REST-friendly, and cache-friendly "URI-based versioning" strategy where the version is specified in a URI path. For exanple:
+
+> GET /v1/home
+
 #### Common errors
 
 | HTTP Status code | Reason |
@@ -104,7 +110,7 @@ Distinct user accounts (accountants and viewers) with adequate authorizations.
 
 #### Authentication
 
-##### POST /auth/login
+##### POST /v1/auth/login
 
 **Request payload**
 
@@ -127,7 +133,7 @@ When signing in succeeds, the API responds with a 200 status code and a JWT toke
 }
 ```
 
-##### GET /me
+##### GET /v1/me
 
 **Request headers**
 
@@ -156,7 +162,7 @@ When the JWT is valid (correct structure and hasn't expired), the API responds w
 
 #### Home page
 
-##### GET /home
+##### GET /v1/home
 
 **Request headers**
 
@@ -183,7 +189,7 @@ When the JWT is valid (correct structure and it hasn't expire), the API responds
 
 #### System data
 
-##### GET /system/essentials
+##### GET /v1/system/essentials
 
 This endpoint provides essential information about the system to any user, regardless of their authentication state.
 
@@ -197,7 +203,7 @@ This endpoint provides essential information about the system to any user, regar
 }
 ```
 
-##### GET /system/feature_flags
+##### GET /v1/system/feature_flags
 
 This endpoint provides the list of feature-flags enabled for the authenticated user. Flags may not be enable to all users as they might require a specific `role`
 r be assigned by an A/B testing policy depending on the user's cohort.
