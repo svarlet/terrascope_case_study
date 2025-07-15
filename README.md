@@ -344,3 +344,89 @@ The response payload contains activities that match the page specified with the 
 ```
 
 ### Data schema
+
+```sql
+CREATE TYPE role AS ENUM ('admin', 'accountant', 'viewer');
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    cognito_sub UUID UNIQUE NOT NULL,       -- From Cognito's `sub` claim
+    email TEXT UNIQUE NOT NULL CHECK (email ~* '^[^@]+@[^@]+\.[^@]+$'),
+
+    first_name TEXT,
+    last_name TEXT,
+
+    role role NOT NULL DEFAULT 'viewer',
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE emission_factors (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    name TEXT NOT NULL,                          -- Human-readable label
+    activity_type TEXT NOT NULL,                 -- Category for matching, e.g. "electricity", "freight"
+    unit TEXT NOT NULL,                          -- Unit expected from user (e.g. "kWh", "liters")
+    factor_value NUMERIC NOT NULL,               -- Emission factor value (e.g. 0.408)
+    factor_unit TEXT NOT NULL,                   -- Typically "kgCO2e"
+
+    source TEXT,                                 -- Short citation (e.g. "EPA 2022")
+    year INTEGER,                                -- Optional versioning
+    geography TEXT,                              -- Optional: "SG", "EU", "US"...
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TYPE activity_status AS ENUM (
+    'ingested',
+    'matching',
+    'calculated',
+    'failed'
+);
+
+CREATE TABLE activities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    upload_id UUID NOT NULL REFERENCES uploads(id),
+    row_number INTEGER,                             -- Position in uploaded file
+    raw_description TEXT NOT NULL,                  -- User-provided or parsed activity label
+    raw_volume NUMERIC,                             -- e.g., 1000
+    raw_unit TEXT,                                  -- e.g., "kWh", "liters"
+
+    status activity_status NOT NULL DEFAULT 'ingested',
+
+    matched_factor_id UUID REFERENCES emission_factors(id),   -- Set by processing worker
+    factor_confidence NUMERIC,                                -- Optional (from AI)
+    emissions NUMERIC,                                        -- Final computed result
+    emissions_unit TEXT,                                      -- Typically "kgCO2e"
+
+    failure_reason TEXT,                                      -- Why it failed, if applicable
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TYPE upload_status AS ENUM (
+    'pending_upload',   -- Pre-signed URL issued, waiting for file to be uploaded to S3
+    'uploaded',         -- File is now present in S3
+    'parsing',          -- Worker is ingesting activities
+    'parsed',           -- Successfully parsed
+    'failed'            -- Fatal error during parsing
+);
+
+CREATE TABLE uploads (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    accountant UUID NOT NULL REFERENCES users(id),
+    s3_object_url TEXT NOT NULL UNIQUE,                      -- S3 key or full URL to file
+
+    status upload_status NOT NULL DEFAULT 'pending_upload',
+    failure_reason TEXT,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
