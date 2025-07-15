@@ -92,11 +92,15 @@ architecture-beta
 
 ### File processing workflow
 
-This workflow starts by a CSV file upload from our web application to an S3 bucket using "pre-signed urls". This AWS S3 feature enables the user to upload a file directly to our private S3 bucket thereby freeing a lambda from performing this bits-moving task, especially considering that lambdas aren't allowed to last more than 15 minutes.
+When an accountant uploads a file, the system begins by creating a record in the database to track that upload. At the same time, it issues a pre-signed URL, allowing the file to be uploaded securely and directly to an S3 bucket without passing through our servers.
 
-The uploaded file groups activities which needs to be processed individually, so we will parse each line to validate their syntax and semantics. If we find any invalid line, we reject the whole group to give the accountant a chance to fix the file and re-upload. Should the file pass this validation step, we update our database by recording each activity separately.
+Once the upload completes, the system detects the file’s presence and updates its status accordingly. A background process then takes over to parse the file and ingest the business activity data it contains.
 
-The activities are initialized with a status indicating they've been ingested and are ready to be matched with an emission factor.
+If every row in the file is valid, the data is ingested successfully, and the upload is marked as parsed. But if even a single row contains an error—such as an unrecognized unit or malformed value—the entire file is rejected. No data is ingested, and the system records the reason for failure.
+
+This all-or-nothing approach is intentional. While it may seem strict, it is actually more convenient for the accountant: partial ingestion would mean they’d have to manually split, clean, and resubmit parts of the file. By clearly rejecting problematic files as a whole, we enable faster correction and clearer accountability, without the risk of silently skipping or partially processing important data.
+
+This workflow ensures clean, reliable data while keeping the user experience straightforward and predictable.
 
 ```mermaid  
 flowchart TD
