@@ -2,7 +2,6 @@
 
 ## INBOX
 
-- [ ] Risks and mitigations
 - [ ] Review principples
 - [ ] Did I document single-tenant infra?
 - [ ] Document choice of storage: S3 and Aurora focusing on scalability and latency
@@ -135,6 +134,48 @@ Distinct user accounts (accountants and viewers) with adequate authorizations.
 - Viewers can view activities
 
 ## Technical implementation
+
+### Key infrastructure choices
+
+#### Storage
+
+Our platform uses Amazon S3 to store uploaded files and Amazon Aurora (PostgreSQL-compatible) for structured data. This combination gives us a storage foundation that scales effortlessly while maintaining strong performance and low latency.
+
+S3 is ideal for file uploads. It handles virtually unlimited volumes of data without manual scaling. Files are uploaded directly from the browser to S3 using secure pre-signed URLs, which offloads our backend and speeds up ingestion. It’s highly durable, cost-effective, and performs reliably regardless of file size or upload frequency.
+
+Aurora is used for all structured records: users, activities, emission factors, and processing results. It offers the reliability and familiarity of PostgreSQL, but with built-in scalability, replication, and automated failover. Reads and writes remain fast even as data volume and concurrency increase.
+
+This architecture ensures that as more customers join the platform, and as activity volumes grow, the system remains responsive, reliable, and easy to operate — without introducing unnecessary complexity or future rework.
+
+#### Security, Identity, and Access Management
+
+We’ve chosen a single-tenant infrastructure model to serve customers independently and securely. Each tenant’s data and workflows are isolated by design, which simplifies compliance, improves fault isolation, and builds customer trust. It also allows for flexible, per-client deployment options down the line — including on-prem or region-specific instances if needed.
+
+User authentication and access control are handled by AWS Cognito, with permissions delegated via IAM roles where appropriate. Cognito offloads the complexity of secure user management — including login, MFA, and token issuance — while integrating natively with other AWS services. IAM gives us fine-grained control over internal service access, ensuring that background workers, parsers, and upload handlers operate with the minimum privileges required.
+
+This setup aligns with our goals of fast onboarding, secure data isolation, and a scalable operational model — without introducing the overhead of building identity infrastructure from scratch.
+
+#### Compute and Messaging
+
+Our architecture uses AWS Lambda for compute, API Gateway for exposing secure endpoints, and SQS for asynchronous task management. This setup is designed to handle variable workloads efficiently while keeping infrastructure lean and responsive.
+
+Lambda gives us event-driven scalability with no servers to manage. It’s ideal for workflows like parsing, matching, and post-processing that happen in response to events (file uploaded, match returned, etc.). We only pay for what we use, which is cost-effective during early growth and safe under heavy load.
+
+API Gateway exposes our endpoints securely and scalably. It handles authentication, rate limiting, and throttling, giving us production-grade request handling without standing up full web servers.
+
+SQS decouples components and adds resilience. It buffers incoming tasks — like matching activities or ingesting uploads — and ensures they’re retried on failure without blocking other operations. This makes the system more fault-tolerant and keeps each service focused on a single responsibility.
+
+Together, these services allow us to build a scalable, cost-conscious platform that responds well under load, handles bursts gracefully, and remains easy to evolve over time.
+
+#### Programming languages and frameworks
+
+The infrastructure we’ve chosen gives us the freedom to use the right tools for each job — without being locked into a single language or framework.
+
+Today, we can confidently build around JavaScript, Python, and React, technologies already in use at Terrascope. These choices support rapid development, ease of hiring, and consistency across frontend and backend teams.
+
+Because our architecture is event-driven and loosely coupled — with SQS, Lambda, and containerized workers — it’s straightforward to introduce new languages where they bring clear advantages. For example, we could add Go for fast, concurrent processing or Rust for low-latency data transformation tasks, without needing to rearchitect the system.
+
+This flexibility allows us to evolve the platform gradually, scale specialized components when needed, and stay aligned with both developer preferences and technical demands as we grow.
 
 ### High-level diagram
 
