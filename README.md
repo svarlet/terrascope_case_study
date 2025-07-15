@@ -22,21 +22,15 @@ This workflow ensures clean, reliable data while keeping the user experience str
 
 ### Activity emission factor matching workflow
 
-Once a file has been successfully parsed and the business activities have been stored in the system, each activity is sent for automatic processing through an external AI-based emission factor matcher.
+After activities are parsed and stored in the system, the backend attempts to match each activity to an emission factor. To optimize performance and reduce reliance on a third-party service, the system first checks its internal database to see if a similar activity has already been matched in the past.
 
-This matcher receives the raw description, volume, and unit of each activity and attempts to find the most appropriate emission factor from a curated dataset. Because this is a third-party service that may take several minutes to respond and has concurrency limits, activities are sent to it asynchronously through a processing queue.
+If a suitable match is found — for example, an identical description and unit combination from another user or file — the system reuses the previously matched emission factor and immediately calculates the emissions. This process is fast, transparent, and auditable.
 
-A dedicated worker in our system listens for the results. When a match is returned, it immediately calculates the emissions for that activity using the matched emission factor. The activity record is then updated with the final emissions value, the emission factor used, and the confidence level returned by the AI.
+If no match is found in the system, the activity is sent to the external AI Matcher.
 
-If the AI fails to return a usable match or the input cannot be interpreted (for example, due to vague or nonsensical descriptions), the activity is marked as failed, and the failure reason is stored for visibility and troubleshooting.
+When a valid result is returned, the system calculates the emissions and stores the matched factor, the result, and the confidence. If the AI fails to provide a match, the activity is marked as failed with a reason recorded for visibility.
 
-This design ensures that:
-
-- The matching and calculation process is scalable and fault-tolerant.
-- Each activity progresses independently, without blocking the entire upload.
-- Accountants are presented with either a complete emissions result or a clear, actionable failure message.
-
-By fully automating the matching and calculation steps while making errors transparent, the system enables fast, accurate emissions reporting with minimal back-and-forth or manual intervention.
+This hybrid approach gives us the best of both worlds: performance and scalability via caching, and accuracy and flexibility via the AI matcher when needed. It also helps us reduce latency, control costs, and serve more customers reliably as the system grows.
 
 ![diagram](./mermaid/README-3.svg)
 
