@@ -249,7 +249,7 @@ This endpoint accepts a csv file of customer activities. There are various outco
 - Some activities are not parsable (so none are ingested)
 - Some activities are successfully ingested, but the system failed to accept some (unhealthy system, blip, ...).
 
-The endpoint accomodates these scenarios by responding with an ingestion report.
+Ingested activities are attributed a unique identity value and stored. See the `GET /v1/activities` endpoint.
 
 **Request headers**
 
@@ -283,4 +283,56 @@ Finally, given a syntaxically valid CSV file, the API will respond with a `422` 
 
 ```json
 string // CSV rows that could not be ingested this time
+```
+
+##### GET /v1/activities
+
+This endpoint responds with a paginated list of activities data, and metadata such as their current ingestion status.
+
+**Request headers**
+
+```
+Authorization: Bearer <jwt token>
+```
+
+**Query parameters**
+
+| Name | Default | Description |
+| --- | --- | --- |
+| offset | 0 | A positive integer to position the beginning of the page |
+| limit | 25 | A positive number to set the number of activities on that page |
+
+**Response**
+
+The response payload contains activities that match the page specified with the query parameters. The original activities data and their processing status are returned.
+
+```json
+{
+  "offset": positive int,
+  "limit": positive int,
+  "activities": [
+    {
+      "id": uuid,
+      "emissions": {
+        "pollutant": {
+          "id": uuid,
+          "name": string
+        },
+        "amount": {
+          "unit": string,
+          "quantity": float
+        }
+      }, 
+
+      ...original activity data...
+
+      "metadata": {
+        "status": "ingested" | "matching" | "computing" | "success" | "failure",
+        "ingested_on": datetime,
+        "updated_at": datetime,
+        "submitted_by": user account
+      }
+    }
+  ]
+}
 ```
