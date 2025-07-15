@@ -188,9 +188,7 @@ Distinct user accounts (accountants and viewers) with adequate authorizations.
 
 #### Authentication
 
-**Endpoint**
-
-POST /auth/login
+##### POST /auth/login
 
 **Request payload**
 
@@ -213,11 +211,7 @@ When signing in succeeds, the API responds with a 200 status code and a JWT toke
 }
 ```
 
-#### The "Me" endpoint
-
-**Endpoint**
-
-GET /me
+##### GET /me
 
 **Request headers**
 
@@ -246,9 +240,7 @@ When the JWT is valid (correct structure and hasn't expired), the API responds w
 
 #### Home page
 
-**Endpoint**
-
-GET /home
+##### GET /home
 
 **Request headers**
 
@@ -275,11 +267,9 @@ When the JWT is valid (correct structure and it hasn't expire), the API responds
 
 #### System data
 
+##### GET /system/essentials
+
 This endpoint provides essential information about the system to any user, regardless of their authentication state.
-
-**Endpoint**
-
-GET /system/essentials
 
 **Response**
 
@@ -291,12 +281,10 @@ GET /system/essentials
 }
 ```
 
+##### GET /system/feature_flags
+
 This endpoint provides the list of feature-flags enabled for the authenticated user. Flags may not be enable to all users as they might require a specific `role`
 r be assigned by an A/B testing policy depending on the user's cohort.
-
-**Endpoint**
-
-GET /system/feature_flags
 
 **Request headers**
 
