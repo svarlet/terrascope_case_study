@@ -356,49 +356,45 @@ Another user may simultaneously get the following feature flags:
 
 #### Activities upload
 
-##### POST /v1/avtivities
+##### GET /v1/upload/new
 
-This endpoint accepts a csv file of customer activities. There are various outcomes to uploading activities:
+Generates a pre-signed url allowing the authenticated accountant to upload a CSV file to our private S3 bucket.
 
-- Each activity is successfully ingested by the system, and their processing will ensue;
-- Some activities are not parsable (so none are ingested)
-- Some activities are successfully ingested, but the system failed to accept some (unhealthy system, blip, ...).
-
-Ingested activities are attributed a unique identity value and stored. See the `GET /v1/activities` endpoint.
-
-**Request headers**
+**Request header**
 
 ```
 Authorization: Bearer <jwt token>
-Content-Type: multipart/form-data
+```
+
+**Response**
+
+A `200` status code with a pre-signed url in the response body.
+
+```json
+https://terrascope-clientxxxx-s3-bucket.s3.us-west-2.amazonaws.com/key?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAEXAMPLE123456789%2F20210621%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210621T041609Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=EXAMBLE1234494d5fba3fed607f98018e1dfc62e2529ae96d844123456
+```
+
+##### POST /v1/upload
+
+Notify the API of a successful file upload to S3.
+
+**Request header**
+
+```
+Authorization: Bearer <jwt token>
 ```
 
 **Request payload**
 
-It's the CSV file.
+```json
+{
+  "presigned_url": url
+}
+```
 
 **Response**
 
-Assuming a valid JWT token and no ingestion issue, the API responds with a `202` status code indicating that the data was successfully accepted and processing will ensue.
-
-If the parser fails to process any of the activities, the file is rejected as a whole. The API responds with a `400` code and a payload reporting the parsing errors.
-
-```json
-[
-  {
-    "line": positive int >= 0,
-    "index": positive int >= 0,
-    "error": string,
-    "message": string
-  }
-]
-```
-
-Finally, given a syntaxically valid CSV file, the API will respond with a `422` status code when the system was unable to ingest some activities. The response payload will report precisely the items that could not be ingested.
-
-```json
-string // CSV rows that could not be ingested this time
-```
+The API responds with a `204` status and an empty body.
 
 ##### GET /v1/activities
 
