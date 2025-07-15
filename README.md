@@ -3,10 +3,21 @@
 ## INBOX
 
 - [ ] Risks and mitigations
-- [ ] Review delivery plan
 - [ ] Review principples
 - [ ] Did I document single-tenant infra?
-- [ ] Document assumptions
+- [ ] Document choice of storage: S3 and Aurora focusing on scalability and latency
+- [ ] Document choice of Cognito, IAM, RBAC/roles, and single tenant infra for security and user management
+- [ ] Document the programming stack (react, python, node, framework, etc.)
+- [ ] Document the deployment strategy (trunk based, automated testing, linting, terraform, feature flags)
+
+## Supporting assumptions
+
+Based on the document provided to support this exercise, certain assumptions were made to design the processes and infrastructure of this Carbon Accounting Platform. This section documents these assumptions.
+
+1. Regulations, prospects, and customers tolerate building our platform on a public cloud such as AWS.
+2. The AI Matcher service doesn't belong to Terrascope. Terrascope does not define its roadmap. Terrascope cannot invest in improving this service scalability or performance.
+3. Among the reported activities, some reoccur periodically. For example, a Singapore-based supermarket's electricity bill remains comparable on two consecutive months.
+4. Customers can report on their activities via a CSV file for a period.
 
 ## Key workflows
 
@@ -58,8 +69,8 @@ Start onboarding customers. Evaluate the UX of file uploads. Discover the hetero
 
 **Key product increments**
 
-- Simple frontend with `Basic` Auth, activities upload form;
-- API to upload activities as a CSV file and log individual activities;
+- Simple frontend with Cognito based authentication, activities upload form;
+- API to upload activities as a CSV file with pre-signed URLs (S3)
 - S3 bucket to store uploaded activities;
 - Terraform scripts;
 - Continuous delivery with Github Actions
@@ -74,7 +85,7 @@ Early AI Matcher discovery: discover challenges, risks, API differences, etc.
 
 - Activities are individually pushed to the AI Matcher through an SQS queue with a unique lambda listener (concurrency = 1)
 - AI Matcher results queued with SQS. A unique lambda listener calculates the activity emissions and records them in the DB
-- AI Matcher failures forwarded to a dead letter queue.
+- AI Matcher failures forwarded to a dead letter queue. A Cloudwatch alarm enables the team to react quickly to matching failures.
 - Frontend shows a paginated table of the activities and their respective emissions
 
 #### 🚀 Delivery #3
@@ -105,12 +116,11 @@ Near real time visibility on health of the infrastructure.
 
 **Objective**
 
-Isolate customers and upgrade authentication.
+Isolate customers' organisation
 
 **Key product increments**
 
 - Single tenant infrastructure (dedicated AWS infrastructure per tenant). Terraform scripts refactored accordingly.
-- AWS Cognito to support user authentication
 
 #### 🚀 Delivery #6
 
@@ -464,3 +474,50 @@ CREATE TABLE uploads (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
+
+## Risks and mitigations
+
+### Scalability
+
+| **Risk**                                                | **Impact** | **Likelihood** | **Mitigation**                                                                                                                     |
+| ------------------------------------------------------- | ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| AI Matcher is a bottleneck (rate-limited, slow) | High       | High           | Use the database as a **cache** for previous matches. Track match reuse rate and confidence thresholds. Precompute common matches. |
+
+### Performance
+
+| **Risk**                                            | **Impact** | **Likelihood** | **Mitigation**                                                                                       |
+| --------------------------------------------------- | ---------- | -------------- | ---------------------------------------------------------------------------------------------------- |
+| Large files cause parsing timeouts or memory spikes | High       | Medium         | Stream files line-by-line. Impose upload size limits. Use isolated parsing workers.                  |
+
+### Latency
+
+| **Risk**                              | **Impact** | **Likelihood** | **Mitigation**                                                                                        |
+| ------------------------------------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------- |
+| High time-to-result for large uploads | High       | Medium         | Show **progress indicators**. Deliver activity results incrementally. Parallelize processing.         |
+| Cache lookup slows with scale         | Medium     | Low            | Extract `match_cache` table. Normalize and index on description + unit. Prune low-confidence entries. |
+
+### Security
+
+| **Risk**                                   | **Impact** | **Likelihood** | **Mitigation**                                                                                      |
+| ------------------------------------------ | ---------- | -------------- | --------------------------------------------------------------------------------------------------- |
+| Pre-signed S3 URLs may be leaked or reused | Medium     | Medium         | Expire URLs after short time window. Set restrictive S3 ACLs. Log access.                           |
+
+### Privacy
+
+| **Risk**                                         | **Impact** | **Likelihood** | **Mitigation**                                                                       |
+| ------------------------------------------------ | ---------- | -------------- | ------------------------------------------------------------------------------------ |
+| Uploaded activities may contain sensitive data   | High       | Medium         | Encrypt data on S3. Least-privileged access standard policy. Document handling in privacy policy.                  |
+| Third-party AI service receives proprietary data | High       | Medium         | Hide the provenance of the data. Implement data lineage. Document data transfers and train customers. |
+
+### Storage
+
+| **Risk**                                         | **Impact** | **Likelihood** | **Mitigation**                                                                                   |
+| ------------------------------------------------ | ---------- | -------------- | ------------------------------------------------------------------------------------------------ |
+| S3 bucket grows indefinitely with stale files    | Medium     | High           | Set lifecycle policies to delete files in `pending_upload` after 24h or unused after 30–90 days. |
+| Duplicate emission factors from multiple sources | Medium     | Low            | Normalize by `source + year`. Deduplicate before insert. Defer full versioning for later phase.  |
+
+### Observability
+
+| **Risk**                              | **Impact** | **Likelihood** | **Mitigation**                                                                                    |
+| ------------------------------------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------- |
+| Failures or retries are hard to trace | Medium     | Medium         | Add `retry_count`, `last_attempt_at`, and processing logs. Build lightweight admin UI for review. |
