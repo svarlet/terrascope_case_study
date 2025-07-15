@@ -172,3 +172,142 @@ Distinct user accounts (accountants and viewers) with adequate authorizations.
 
 - Accountant user type can upload and view activities
 - Viewers can view activities
+
+## Technical implementation
+
+### Key API endpoints
+
+#### Common errors
+
+| HTTP Status code | Reason |
+|------------------|--------|
+| 400 | Invalid request. The payload or the JWT token cannot be parsed. |
+| 401 | Unauthorized. The JWT token is missing or has expired. |
+| 403 | The authenticated user lacks sufficient privileges to access the requested resource. Do they have the adequate role? |
+| 404 | The resource does not exist. |
+
+#### Authentication
+
+**Endpoint**
+
+POST /auth/login
+
+**Request payload**
+
+```json
+{
+  "credentials": {
+    "login": string,
+    "password": string
+  }
+}
+```
+
+**Response**
+
+When signing in succeeds, the API responds with a 200 status code and a JWT token in the payload. The JWT encodes the user's unique identity as a `uuid` and its `role` ("accountant" or "viewer")
+
+```json
+{
+  "jwt": string
+}
+```
+
+#### The "Me" endpoint
+
+**Endpoint**
+
+GET /me
+
+**Request headers**
+
+```
+Authorization: Bearer <jwt token>
+```
+
+**Response**
+
+When the JWT is valid (correct structure and hasn't expired), the API responds with a 200 status code and a payload with information about the signed in user.
+
+```json
+{
+  "identity": {
+    "firstname": string,
+    "lastname": string,
+  },
+  "email": string,
+  "preferences": {
+    "marketing_opted_in": bool,
+    time_format: 12 | 24,
+    timezone: string
+  }
+}
+```
+
+#### Home page
+
+**Endpoint**
+
+GET /home
+
+**Request headers**
+
+```
+Authorization: Bearer <jwt token>
+```
+
+**Response**
+
+When the JWT is valid (correct structure and it hasn't expire), the API responds with a 200 status code and a payload with data to render on the home page for the signed in user:
+
+```json
+{
+  "announcement": string, // upcoming release, scheduled maintenance, etc.
+  "product_tips" : [ // illustrative - a list of product tips to display
+    {
+      "title": string,
+      "description": string,
+      "permalink": url
+    }
+  ]
+}
+```
+
+#### System data
+
+This endpoint provides essential information about the system to any user, regardless of their authentication state.
+
+**Endpoint**
+
+GET /system/essentials
+
+**Response**
+
+```json
+{
+  "help_url": url,
+  "support_email": email,
+  "version": string,
+}
+```
+
+This endpoint provides the list of feature-flags enabled for the authenticated user. Flags may not be enable to all users as they might require a specific `role`
+r be assigned by an A/B testing policy depending on the user's cohort.
+
+**Endpoint**
+
+GET /system/feature_flags
+
+**Request headers**
+
+```
+Authorization: Bearer <jwt token>
+```
+
+**Response**
+
+Assuming a valid jwt token (structure and expiry check), the endpoint responds with a 200 status code and a list of flags enabled for the authenticated user.
+
+```json
+[string]
+```
