@@ -235,6 +235,6 @@ At the same moment, another user may get the following feature flags:
 
 ```json
 [
-  product_tips
+  "product_tips"
 ]
 ```
