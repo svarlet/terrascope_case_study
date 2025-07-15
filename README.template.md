@@ -406,7 +406,11 @@ The response payload contains activities that match the page specified with the 
           "unit": string,
           "quantity": float
         }
-      }, 
+      },
+      "emission_factor": {
+        "name": string,
+        "url": url
+      },
 
       ...original activity data...
 
