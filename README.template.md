@@ -315,7 +315,7 @@ Assuming a valid jwt token (structure and expiry check), the endpoint responds w
 ]
 ```
 
-At the same moment, another user may get the following feature flags:
+Another user may simultaneously get the following feature flags:
 
 ```json
 [
