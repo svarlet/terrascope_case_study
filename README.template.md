@@ -1,10 +1,5 @@
 # Terrascope Case Study
 
-## INBOX
-
-- [ ] Review principples
-- [ ] Document the deployment strategy (trunk based, automated testing, linting, terraform, feature flags)
-
 ## Supporting assumptions
 
 Based on the document provided to support this exercise, certain assumptions were made to design the processes and infrastructure of this Carbon Accounting Platform. This section documents these assumptions.
