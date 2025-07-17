@@ -530,6 +530,26 @@ CREATE TABLE uploads (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Index to support sorting and filtering by activity date (e.g. for UI display)
+CREATE INDEX idx_activities_activity_date
+ON activities(activity_date);
+
+-- Composite index to support cache-based lookups:
+-- Match historical activities by description, date, and location
+CREATE INDEX idx_activities_match_lookup
+ON activities(activity_description, activity_date, location);
+
+-- Index to support filtering and grouping by pollutant type
+-- Useful for reports, dashboards, or aggregation
+CREATE INDEX idx_activities_pollutant_type
+ON activities(pollutant_type);
+
+-- Partial index to speed up queries that target finalized emissions data
+-- This makes queries like "get all calculated activities" much faster
+CREATE INDEX idx_activities_calculated
+ON activities(activity_date)
+WHERE status = 'calculated';
 ```
 
 ## Risks and mitigations
