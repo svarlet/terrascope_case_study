@@ -39,6 +39,19 @@ This hybrid approach gives us the best of both worlds: performance and scalabili
 
 ![diagram](./mermaid/README-2.svg)
 
+### UI workflows
+
+This case study doesn't emphasize key UI or UX requirements beyond the need to upload activities and paginate the display of the results. Here are some additional consideration to enhance the customer experience that could be considered without altering the architecture proposed in this document (or lightly).
+
+1. Display the status of each activity to give a sense of processing progress.
+2. Asking for support related to an activity, especially when its processing failed or to challenge its result.
+3. Exporting a report (or various report). From a customer-centric viewpoint, calculating the emissions of their activities isn't an end in itself. The value of Terrascope's product lies in supporting the clients with analysis, reporting (internally, to auditors, or to regulators), and decision-making.
+4. Managing collaboration within each client account with roles.
+5. Viewing a trail of uploads (what, who, when)
+6. Asking for general support.
+7. Displaying product tips
+8. Customer feedback submission
+
 ## Project delivery
 
 ### Principles
