@@ -56,20 +56,25 @@ This case study doesn't emphasize key UI or UX requirements beyond the need to u
 
 ### Principles
 
-Rooted in Agile principles and a Product Mindset, the following customer-centric delivery plan aims to slice feature development to achieve small-yet-frequent value-add deliveries.
+### 🚀 Project Delivery Principles
 
-The making of software products is a function of its engineering processes: suboptimal development practices compound to exponential software rot and lead to unhappy management and customers. This plan recommends battle-tested techniques and practices:
+Our delivery approach is grounded in Agile principles with a strong focus on stakeholder value and incremental impact.
 
-- Working iteratively and incrementally, delivering often, and getting feedback often;
-- Periodically reviewing our ways of working to do more of what works, and improve wasteful practices;
-- Developing a fast and exhaustive automated test suite that builds confidence about the state of the system in seconds;
-- Connecting teams directly with their customers to engage our product makers with the vision and their impact;
-- Empowering teams to design the software they build: how? at which pace?
-- Fostering a strong sense of ownership by co-deciding the roadmap and releases, and sharing the burden of on-call support.
+Rather than building the platform layer by layer (e.g. database first, then API, then UI), we slice features **vertically** — delivering complete, usable subsets of functionality in each iteration. This approach enables faster feedback, earlier value creation, and de-risks technical dependencies as we go.
 
-NB. The plan that follows should be challenged and rearranged in the face of market changes, customer feedback, or a shift in business priorities. It represents an optimistic strategy to construct the product from scratch.
+Here’s how we would structure initial delivery:
+
+- **Sprint 1**: Onboard customers with accounts and activities uploads. Prepare foundational infrastructure.
+- **Sprint 2**: Integrate the AI Matcher service, unoptimized. Display activities status on the frontend.
+- **Sprint 3**: Mitigate AI Matcher service performance & scalability limits.
+- **Sprint 4**: Industrialize the product with observability tools.
+- **Sprint 5+**: Secure the platform by isolating customers with a single tenant infrastructure.
+
+Each sprint delivers vertical value to the user while keeping the system extensible. This ensures that we move fast without accumulating rework — and that we’re always aligned with real customer needs.
 
 ### Sliced delivery plan
+
+The plan that follows should be challenged and rearranged in the face of market changes, customer feedback, or a shift in business priorities. It represents an optimistic strategy to construct the product from scratch.
 
 #### 🚀 Delivery #1
 
@@ -95,7 +100,6 @@ Early AI Matcher discovery: discover challenges, risks, API differences, etc.
 
 - Activities are individually pushed to the AI Matcher through an SQS queue with a unique lambda listener (concurrency = 1)
 - AI Matcher results queued with SQS. A unique lambda listener calculates the activity emissions and records them in the DB
-- AI Matcher failures forwarded to a dead letter queue. A Cloudwatch alarm enables the team to react quickly to matching failures.
 - Frontend shows a paginated table of the activities and their respective emissions
 
 #### 🚀 Delivery #3
