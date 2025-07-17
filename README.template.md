@@ -6,8 +6,9 @@ Based on the document provided to support this exercise, certain assumptions wer
 
 1. Regulations, prospects, and customers tolerate building our platform on a public cloud such as AWS.
 2. The AI Matcher service doesn't belong to Terrascope. Terrascope does not define its roadmap. Terrascope cannot invest in improving this service scalability or performance.
+3. The AI Matcher service can be consumed via a secure HTTP API. This API has back-pressure mechanisms built in such as rate-limiting and throttling.
 3. Among the reported activities, some reoccur periodically. For example, a Singapore-based supermarket's electricity bill remains comparable on two consecutive months.
-4. Customers can report on their activities via a CSV file for a period.
+4. Customers can import their activities via a CSV file.
 
 ## Key workflows
 
