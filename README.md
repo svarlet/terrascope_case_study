@@ -31,9 +31,9 @@ After activities are parsed and stored in the system, the backend attempts to ma
 
 If a suitable match is found — for example, an identical description and unit combination from another user or file — the system reuses the previously matched emission factor and immediately calculates the emissions. This process is fast, transparent, and auditable.
 
-If no match is found in the system, the activity is sent to the external AI Matcher.
+If no match is found in the system, the activity is sent to the external AI Matcher. When the matching ends, the AI Matcher service enqueues the result (see EF result queue in the provided high level diagram). No information was provided on the integration mechanisms support by the AI Matcher (webhook, queue, socket, etc.) so a queue has been selected, and could be wrapped by API Gateway to ease the integration with the AI Matcher service should the queue solution be unsupported.
 
-When a valid result is returned, the system calculates the emissions and stores the matched factor, the result, and the confidence. If the AI fails to provide a match, the activity is marked as failed with a reason recorded for visibility.
+When a valid result is returned, the system calculates the emissions and stores the matched factor, the result, and the confidence. If the AI fails to provide a match, the activity is marked as failed with the reason provided by the matcher service recorded for clarity.
 
 This hybrid approach gives us the best of both worlds: performance and scalability via caching, and accuracy and flexibility via the AI matcher when needed. It also helps us reduce latency, control costs, and serve more customers reliably as the system grows.
 
