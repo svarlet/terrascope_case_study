@@ -683,8 +683,9 @@ WHERE status = 'calculated';
 This architecture is designed with scalability, resilience, and security in mind. We’ve identified and accounted for key risks such as:
 
 - **AI Matcher latency and cost**, mitigated through a caching layer that bypasses external calls when possible.
+- **AI Matcher scale and performance**, accomodated with a distributed semaphore to limit concurrent matching.
 - **Large file uploads** and **variable processing times**, addressed with asynchronous queues, worker isolation, and incremental status updates.
-- **Data privacy and security**, enforced through access controls, S3 presigned URLs, and minimal third-party exposure.
+- **Data privacy and security**, enforced through access controls, S3 presigned URLs, minimal third-party exposure, and a single-tenant infrastructure.
 - **Growth-related bottlenecks** (e.g. database or queue load), with autoscaling and indexing strategies in place to support a growing customer base.
 
 These risks are manageable within our chosen architecture and will be continuously monitored as the platform evolves.
