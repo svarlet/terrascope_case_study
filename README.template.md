@@ -230,6 +230,10 @@ SQS decouples components and adds resilience. It buffers incoming tasks — like
 
 Together, these services allow us to build a scalable, cost-conscious platform that responds well under load, handles bursts gracefully, and remains easy to evolve over time.
 
+#### Management of the AI Matcher service load
+
+To ensure strict concurrency limits when interacting with the AI Matcher service, we introduced a distributed semaphore backed by Aurora. This mechanism guarantees that no more than a fixed number of requests (e.g., 10) are in-flight at any given time, aligning with the matcher’s capacity constraints. By leveraging Aurora's transactional capabilities and row-level locking, we can safely and efficiently coordinate access across multiple concurrent workers using a single atomic SQL query. This approach eliminates the need for additional infrastructure (like Redis or DynamoDB), fits seamlessly into our existing architecture, and provides transparent, auditable control over request throttling.
+
 #### Programming languages and frameworks
 
 The infrastructure we’ve chosen gives us the freedom to use the right tools for each job — without being locked into a single language or framework.
