@@ -4,7 +4,8 @@
 
 Various actors use or develop the service. Rather than calling them with vague names such as "users", an effort is made to identify them by their role.
 
-An "accountant" is a customer who uploads their business activities to the service.
+    - An "accountant" is a customer who uploads their business activities to the service.
+    - A "viewer" can consult uploaded business activities and notably their status.
 
 ## Supporting assumptions
 
