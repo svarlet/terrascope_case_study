@@ -35,7 +35,7 @@ flowchart TD
     A[User requests to upload a file] --> B[Backend creates upload record in DB<br>status = 'pending_upload']
     B --> C[Backend generates pre-signed S3 URL]
     C --> D[Frontend uploads file directly to S3]
-    D --> E[Frontend notifies backend]
+    D --> E[S3 notifies backend of upload completion]
     E --> F[Backend updates upload status to 'uploaded']
     F --> G[Lambda starts parsing file from S3]
     G --> H{All rows valid?}
