@@ -662,6 +662,17 @@ CREATE TABLE uploads (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE matcher_semaphore (
+  permit_id TEXT PRIMARY KEY,
+  locked BOOLEAN NOT NULL DEFAULT FALSE,
+  expires_at TIMESTAMPTZ
+);
+
+-- Seed the semaphore with 10 permits
+INSERT INTO matcher_semaphore(permit_id)
+SELECT 'permit-' || i
+FROM generate_series(0, 9) AS i;
+
 -- Index to support sorting and filtering by activity date (e.g. for UI display)
 CREATE INDEX idx_activities_activity_date
 ON activities(activity_date);
