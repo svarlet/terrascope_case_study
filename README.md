@@ -380,28 +380,6 @@ A `200` status code with a pre-signed url in the response body.
 https://terrascope-clientxxxx-s3-bucket.s3.us-west-2.amazonaws.com/key?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAEXAMPLE123456789%2F20210621%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210621T041609Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=EXAMBLE1234494d5fba3fed607f98018e1dfc62e2529ae96d844123456
 ```
 
-##### POST /v1/upload
-
-Notify the API of a successful file upload to S3.
-
-**Request header**
-
-```
-Authorization: Bearer <jwt token>
-```
-
-**Request payload**
-
-```json
-{
-  "presigned_url": url
-}
-```
-
-**Response**
-
-The API responds with a `204` status and an empty body.
-
 ##### GET /v1/activities
 
 This endpoint responds with a paginated list of activities data, and metadata such as their current ingestion status.
