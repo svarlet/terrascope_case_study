@@ -70,9 +70,9 @@ This case study doesn't emphasize key UI or UX requirements beyond the need to u
 
 ### 🚀 Project Delivery Principles
 
-Our delivery approach is grounded in Agile principles with a strong focus on stakeholder value and incremental impact.
+Our delivery approach is grounded in Agile principles with a customer-centric focus and incremental impact.
 
-Rather than building the platform layer by layer (e.g. database first, then API, then UI), we slice features **vertically** — delivering complete, usable subsets of functionality in each iteration. This approach enables faster feedback, earlier value creation, and de-risks technical dependencies as we go.
+Rather than building the platform layer by layer (e.g. database first, then API, then UI), we slice features **vertically**, delivering complete, usable subsets of functionality in each iteration. This approach enables faster feedback, earlier value creation, and de-risks technical dependencies as we go.
 
 Here’s how we would structure initial delivery:
 
@@ -82,7 +82,7 @@ Here’s how we would structure initial delivery:
 - **Sprint 4**: Industrialize the product with observability tools.
 - **Sprint 5+**: Secure the platform by isolating customers with a single tenant infrastructure.
 
-Each sprint delivers vertical value to the user while keeping the system extensible. This ensures that we move fast without accumulating rework — and that we’re always aligned with real customer needs.
+Each sprint delivers vertical value to the user while keeping the system extensible. This ensures that we move fast without accumulating rework — and that we’re always aligned with real customer needs. We notably and deliberately start by creating real customer-value to validate our assumptions early, and "productionize" the architecture soon after.
 
 ### Sliced delivery plan
 
