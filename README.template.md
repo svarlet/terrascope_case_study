@@ -74,7 +74,7 @@ flowchart TD
 
     C -- No --> F[Enqueue activity to AI Matcher]
     F --> S{Acquire 1 permit from semaphore}
-    S -- Must wait --> Retry acquisition later
+    S -- Must wait --> SR[Retry acquisition later]
     S -- Acquired --> Z[Submit business activity to AI Matcher]
 
     Z --> Z1[Enqueue AI Matcher result/failure]

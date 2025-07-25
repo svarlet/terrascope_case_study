@@ -1,5 +1,11 @@
 # Terrascope Case Study
 
+## Actors
+
+Various actors use or develop the service. Rather than calling them with vague names such as "users", an effort is made to identify them by their role.
+
+An "accountant" is a customer who uploads their business activities to the service.
+
 ## Supporting assumptions
 
 Based on the document provided to support this exercise, certain assumptions were made to design the processes and infrastructure of this Carbon Accounting Platform. This section documents these assumptions.
@@ -8,19 +14,19 @@ Based on the document provided to support this exercise, certain assumptions wer
 2. The AI Matcher service doesn't belong to Terrascope. Terrascope does not define its roadmap. Terrascope cannot invest in improving this service scalability or performance.
 3. The AI Matcher service can be consumed via a secure HTTP API. This API has back-pressure mechanisms built in such as rate-limiting and throttling.
 3. Among the reported activities, some reoccur periodically. For example, a Singapore-based supermarket's electricity bill remains comparable on two consecutive months.
-4. Customers can import their activities via a CSV file.
+4. Accountants can import their activities as a CSV file.
 
 ## Key workflows
 
 ### File processing workflow
 
-When an accountant uploads a file, the system begins by creating a record in the database to track that upload. At the same time, it issues a pre-signed URL, allowing the file to be uploaded securely and directly to an S3 bucket without passing through our servers.
+When an accountant uploads a file, the system begins by creating a record in the database to track that upload. At the same time, it issues a pre-signed URL (AWS S3 feature), allowing the file to be uploaded securely and directly to an S3 bucket directly from the browser.
 
-Once the upload completes, the system detects the file’s presence and updates its status accordingly. A background process then takes over to parse the file and ingest the business activity data it contains.
+Once the upload completes, the system detects the file’s presence based on S3 notifications and updates its status accordingly in the database. A background process then takes over to parse the file and ingest its business activity data.
 
-If every row in the file is valid, the data is ingested successfully, and the upload is marked as parsed. But if even a single row contains an error—such as an unrecognized unit or malformed value—the entire file is rejected. No data is ingested, and the system records the reason for failure.
+If every row in the file is valid, the data is ingested successfully, and the upload is marked as parsed. But if any row contains an error, such as an unrecognized unit or malformed value, the entire file is rejected. No data is ingested, and the system records the reason for failure.
 
-This all-or-nothing approach is intentional. While it may seem strict, it is actually more convenient for the accountant: partial ingestion would mean they’d have to manually split, clean, and resubmit parts of the file. By clearly rejecting problematic files as a whole, we enable faster correction and clearer accountability, without the risk of silently skipping or partially processing important data.
+This all-or-nothing approach is intentional. While it may seem strict, it is more convenient for the accountant: partial ingestion would mean they’d have to manually split, clean, and resubmit parts of the file. By clearly rejecting problematic files as a whole, we enable faster correction and clearer accountability, without the risk of silently skipping or partially processing important data.
 
 This workflow ensures clean, reliable data while keeping the user experience straightforward and predictable.
 
@@ -28,15 +34,19 @@ This workflow ensures clean, reliable data while keeping the user experience str
 
 ### Activity emission factor matching workflow
 
-After activities are parsed and stored in the system, the backend attempts to match each activity to an emission factor. To optimize performance and reduce reliance on a third-party service, the system first checks its internal database to see if a similar activity has already been matched in the past.
+After activities are parsed and stored in the system, the backend attempts to match each activity to an emission factor with heuristics and preexisting business activities.
 
-If a suitable match is found — for example, an identical description and unit combination from another user or file — the system reuses the previously matched emission factor and immediately calculates the emissions. This process is fast, transparent, and auditable.
+If a suitable match is found, for example when a recent identical description and unit combination pre-exists, the system reuses the previously matched emission factor and immediately calculates the emissions. This process is fast, transparent, and auditable.
 
-If no match is found in the system, the activity is sent to the external AI Matcher. When the matching ends, the AI Matcher service enqueues the result (see EF result queue in the provided high level diagram). No information was provided on the integration mechanisms support by the AI Matcher (webhook, queue, socket, etc.) so a queue has been selected, and could be wrapped by API Gateway to ease the integration with the AI Matcher service should the queue solution be unsupported.
+Otherwise, the activity is enqueued (Amazon SQS). Lambdas which act as a proxy to the external AI Matcher consume the queue. These "proxy lambdas" enable to load the AI Matcher service optimally, by handling rate-limiting responses gracefully and by controlling how many concurrent requests are sent to the AI Matcher. To that end, we use a distributed semaphore detailed later in this document.
 
-When a valid result is returned, the system calculates the emissions and stores the matched factor, the result, and the confidence. If the AI fails to provide a match, the activity is marked as failed with the reason provided by the matcher service recorded for clarity.
+When the matching ends, the AI Matcher service enqueues the result (see EF result queue in the high level diagram). We also use this event to release a slot back to the distributed semaphore.
 
-This hybrid approach gives us the best of both worlds: performance and scalability via caching, and accuracy and flexibility via the AI matcher when needed. It also helps us reduce latency, control costs, and serve more customers reliably as the system grows.
+When the AI Matcher enqueues a successful matching the system calculates the emissions and stores the matched factor, the result, and the confidence. If the AI Matcher fails to match the activity to a factor, we mark the activity as failed with the reason provided by the matcher service in our database.
+
+This hybrid approach gives us the best of both worlds: performance and scalability via caching, and accuracy and flexibility via the AI matcher when needed. It also helps us reduce latency, control costs, and serve more customers reliably as the system grows. Accountants gain full transparency over the status of their uploaded business activities.
+
+NB. No guideline was provided about the possible integration mechanisms support by the AI Matcher (webhook, queue, socket, etc.) so a queue has been selected. The queue could be wrapped by API Gateway to ease the integration with the AI Matcher service should the queue solution be unsupported.
 
 ![diagram](./mermaid/README-2.svg)
 
